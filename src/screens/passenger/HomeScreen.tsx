@@ -58,8 +58,8 @@ const DUMMY_AUTO_OFFSETS = [
   { latitude: -0.0014, longitude: 0.0021 },
 ] as const;
 
-const COLLAPSED_SHEET_HEIGHT = 340;
-const EXPANDED_SHEET_HEIGHT = 355;
+const COLLAPSED_SHEET_HEIGHT = 360;
+const EXPANDED_SHEET_HEIGHT = 390;
 
 function loadExpoMaps() {
   try {
@@ -172,14 +172,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF2C7',
     borderWidth: 1,
-    borderColor: 'rgba(22,22,22,0.08)',
+    borderColor: '#E5A900',
     shadowColor: '#171717',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.16,
     shadowRadius: 10,
     elevation: 7,
+  },
+  targetIconSurface: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 19,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(22,22,22,0.08)',
   },
   targetButtonPressed: {
     transform: [{ scale: 0.95 }],
@@ -245,6 +255,11 @@ const styles = StyleSheet.create({
     elevation: 7,
     zIndex: 2,
   },
+  findAutoButtonDisabled: {
+    backgroundColor: '#C9CAC8',
+    shadowOpacity: 0.08,
+    elevation: 2,
+  },
   findAutoButtonPressed: {
     transform: [{ scale: 0.98 }],
     opacity: 0.9,
@@ -254,6 +269,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
   },
+  findAutoButtonTextDisabled: {
+    color: '#F7F7F4',
+  },
   routeSelector: {
     marginTop: 16,
     padding: 14,
@@ -261,9 +279,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F7F4',
     borderWidth: 1,
     borderColor: '#E4E4E0',
-  },
-  routeSelectorCollapsed: {
-    marginTop: 70,
   },
   routeSelectorHeader: {
     flexDirection: 'row',
@@ -352,7 +367,6 @@ export default function HomeScreen() {
   const [destination, setDestination] = useState('');
   const [isDestinationExpanded, setIsDestinationExpanded] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const [isFindingAuto, setIsFindingAuto] = useState(false);
   const sheetHeight = useSharedValue(COLLAPSED_SHEET_HEIGHT);
   const sheetHeightPosition = useRef(COLLAPSED_SHEET_HEIGHT);
   const sheetHeightBase = useRef(COLLAPSED_SHEET_HEIGHT);
@@ -398,8 +412,7 @@ export default function HomeScreen() {
       title: `Auto ${index + 1}`,
     })
   );
-  const shouldShowFindAuto = isDestinationExpanded;
-  const baseSheetHeight = shouldShowFindAuto
+  const baseSheetHeight = isDestinationExpanded
     ? EXPANDED_SHEET_HEIGHT
     : COLLAPSED_SHEET_HEIGHT;
   sheetHeightBounds.current = {
@@ -524,15 +537,6 @@ export default function HomeScreen() {
     }
   };
 
-  const findMyAuto = () => {
-    if (!destination.trim()) {
-      return;
-    }
-
-    setIsFindingAuto(true);
-    setTimeout(() => setIsFindingAuto(false), 500);
-  };
-
   const handleDestinationChange = (value: string) => {
     setIsDestinationExpanded(true);
     setDestination(value);
@@ -638,11 +642,13 @@ export default function HomeScreen() {
               pressed && styles.targetButtonPressed,
             ]}
           >
-            {isLocating ? (
-              <ActivityIndicator color="#171717" />
-            ) : (
-              <Crosshair color="#171717" size={23} strokeWidth={2.1} />
-            )}
+            <View style={styles.targetIconSurface}>
+              {isLocating ? (
+                <ActivityIndicator color="#171717" />
+              ) : (
+                <Crosshair color="#171717" size={23} strokeWidth={2.1} />
+              )}
+            </View>
           </Pressable>
         </View>
 
@@ -667,38 +673,27 @@ export default function HomeScreen() {
             />
           </View>
 
-          {shouldShowFindAuto && (
-            <Pressable
-              accessibilityLabel="Find my auto"
-              accessibilityRole="button"
-              onPress={findMyAuto}
-              style={({ pressed }) => [
-                styles.findAutoButton,
-                pressed && styles.findAutoButtonPressed,
-              ]}
-            >
-              {isFindingAuto ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <>
-                  <Text style={styles.findAutoButtonText}>Find My Auto</Text>
-                  <ChevronRight
-                    color="#FFFFFF"
-                    size={20}
-                    strokeWidth={2.3}
-                    style={{ marginLeft: 8 }}
-                  />
-                </>
-              )}
-            </Pressable>
-          )}
-
-          <View
-            style={[
-              styles.routeSelector,
-              !shouldShowFindAuto && styles.routeSelectorCollapsed,
-            ]}
+          <Pressable
+            accessibilityLabel="Find my auto"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: true }}
+            disabled
+            style={[styles.findAutoButton, styles.findAutoButtonDisabled]}
           >
+            <Text
+              style={[styles.findAutoButtonText, styles.findAutoButtonTextDisabled]}
+            >
+              Find My Auto
+            </Text>
+            <ChevronRight
+              color="#F7F7F4"
+              size={20}
+              strokeWidth={2.3}
+              style={{ marginLeft: 8 }}
+            />
+          </Pressable>
+
+          <View style={styles.routeSelector}>
             <View style={styles.routeSelectorHeader}>
               <View>    
                 <Text style={styles.routeSelectorTitle}>Choose your ride</Text>
