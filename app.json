@@ -11,6 +11,22 @@
       "backgroundColor": "#0B0D10"
     },
     "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-maps",
+        {
+          "requestLocationPermission": true,
+          "locationPermission": "ReadyToGo uses your location to center the map."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ReadyToGo uses your location to center the map."
+        }
+      ],
+      "expo-image"
+    ],
     "ios": {
       "supportsTablet": true
     },
